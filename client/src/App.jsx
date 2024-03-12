@@ -4,10 +4,11 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import Signup from './components/signup'
 function App() {
+  const [count, setCount] = useState(0)
 
   return (
     <>
-    <Signup/> 
+ <Signup/>
     </>
   )
 }

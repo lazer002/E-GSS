@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-function signup() {
+function Signup() {
 
 const [user,setUser]=useState({
     firstname:'',email:'',passcord:''
 })
 
+const [dutta,setdutta]=useState('')
 const handleinp = (e)=>{
     let name = e.target.name
     let value = e.target.value
@@ -19,10 +20,13 @@ await axios.post('http://localhost:9999/signup',user)
 .catch(err=>console.log(err))
 }
 
-
-axios.get('http://localhost:9999/user')
-.then(res=>console.log(res))
-.catch(err=>console.log(err))
+useEffect(()=>{
+  const fetchdata = async ()=>{
+ const  data=await axios.get('http://localhost:9999/user')
+  setdutta(data)}
+  fetchdata()
+},[])
+console.log(dutta);
   return (
     <>
 <input type="text" name='firstname' value={user.firstname} onChange={handleinp}/>
@@ -42,4 +46,4 @@ axios.get('http://localhost:9999/user')
   )
 }
 
-export default signup
+export default Signup
