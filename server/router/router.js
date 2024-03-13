@@ -15,9 +15,23 @@ try {
 }
 })
 
-router.get('/user',(req,res)=>{
-    User.find({})
-    // res.send({data:data})
+router.get('/user',async(req,res)=>{
+try {
+    const data =  await User.find()
+    if (data.length > 0) {
+        res.status(200).json({
+          status: "success",
+          message: "User data retrieved successfully",
+          data: data,
+        });
+      } else {
+        res.status(404).json({
+          status: "error",
+          message: "No users found",
+        });
+}} catch (error) {
+    console.log(error);
+}
 })
 
 
