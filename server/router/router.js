@@ -1,43 +1,38 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
+const Country = require('../models/country')
+
+
+
+
+router.get('/getdata',async(req,res)=>{
+try {
+
+  const data =  await Country.find({})
+  res.status(200).json(data)
+ 
+} catch (error) {
+    console.log(error);
+}})
+
+
+
 
 
 router.post('/signup',async(req,res)=>{
-try {
-    const {firstname,email,passcord}=req.body
-    const data = await new User({
-    firstname,email,passcord})
-    data.save() 
-    
-} catch (error) {
-    console.log(error);
-}
-})
-
-router.get('/user',async(req,res)=>{
-try {
-    const data =  await User.find()
-    if (data.length > 0) {
-        res.status(200).json({
-          status: "success",
-          message: "User data retrieved successfully",
-          data: data,
-        });
-      } else {
-        res.status(404).json({
-          status: "error",
-          message: "No users found",
-        });
-}} catch (error) {
-    console.log(error);
-}
-})
-
-
-
-
-
+  console.log(req.body);
+  try {
+      const {Firstname,Lastname,Email,Country,State,City,Gender,Dateofbirth,Age}=req.body.user
+      const {selectedCountry,selectedState}=req.body
+      const data =  new User({
+        Firstname,Lastname,Email,Country:selectedCountry,State:selectedState,City,Gender,Dateofbirth,Age})
+    await  data.save() 
+      
+  } catch (error) {
+      console.log(error);
+  }
+  })
 
 
 

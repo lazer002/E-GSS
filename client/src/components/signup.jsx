@@ -1,152 +1,134 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
+
 
 function Signup() {
 
+  const [data, setData] = useState([]);
+
   const [user, setUser] = useState({
-    firstname: '', email: '', passcord: ''
+    Firstname: '', Lastname: '', Email: '', Country: '', State: '', City: '', Gender: '', Dateofbirth: '', Age: ''
   })
+
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedCountryStates, setSelectedCountryStates] = useState([]);
+  const [selectedStateCities, setSelectedStateCities] = useState([]);
+
+  const handleCountryChange = (e) => {
+    const selectedCountryName = e.target.value;
+    const selectedCountryData = data.find(item => country(item) === selectedCountryName);
+    setSelectedCountry(selectedCountryName);
+    setSelectedCountryStates(selectedCountryData ? selectedCountryData.states : []);
+    setSelectedState('');
+    setSelectedStateCities([]);
+  };
+
+  const handleStateChange = (e) => {
+    const selectedStateName = e.target.value;
+    setSelectedState(selectedStateName);
+    const selectedStateData = selectedCountryStates.find(state => state.name === selectedStateName);
+    setSelectedStateCities(selectedStateData ? selectedStateData.cities : []);
+  };
+
+  const handleCityChange = (e) => {
+    const selectedCity = e.target.value;
+    setUser(prevUser => ({ ...prevUser, City: selectedCity }));
+  };
+
 
 
   const handleinp = (e) => {
-    let name = e.target.name
-    let value = e.target.value
+    let { name, value } = e.target
     setUser({ ...user, [name]: value })
-  }
-  const postdata = async (e) => {
-    e.preventDefault()
-    console.log(user);
-    await axios.post('http://localhost:9999/signup', user)
+    console.log(user, 'ifhwaiofhwoahfow');
+    if (name === 'Dateofbirth') {
 
-  }
-
-
-
-
-
-
-
-
-  const [data, setData] = useState([]);
-  const res = async (e) => {
-    try {
-      const response = await axios.get('http://localhost:9999/user')
-      // console.log(response, 'ghhhhhhhhhhhh');
-      setData(response.data.data)
-    } catch (error) {
-      console.log(error);
+      calculateAge(value);
     }
   }
+  const postdata = async (e) => {
+
+    e.preventDefault()
+    console.log(user);
+    await axios.post('http://localhost:9999/signup', { user, selectedCountry, selectedState })
+
+  }
+
 
 
   useEffect(() => {
-    res()
-  }, [])
-  console.log(data, 'response.data.data');
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:9999/getdata');
+        setData(response.data);
+        console.log(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
 
+  const country = (item) => {
+    return item.name;
+  };
+  const state = (states) => {
+    return states.map((state, index) => (
+      <option key={index}>{state.name}</option>
+    ));
+  };
 
-  // const [data, setData] = useState([]);
-  // useEffect(()=>{
-  // try {
-  //  axios.get('http://localhost:9999/user')
-  //    .then(res=> setData(res.data.data))
-  //    .catch(err=> console.log(err))
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   },[])
-  //   console.log(data,'response.data.data');
+  const city = (states) => {
+    return states.flatMap((state) => state.cities.map((city, index) => (
+      <option key={index}>{city}</option>
+    )));
+  };
 
+  const calculateAge = (dob) => {
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    borderRadius: '10px',
-    boxShadow: 24,
-    p: 4,
-  }
-  
-const [dup,setdup]=useState({
-  un:'',ue:'',up:''
-})
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
 
-const updt = (e)=>{
- let name = e.target.name
- let value = e.target.value
-  setdup({...dup,[name]:value})
-}
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
 
-const updatedata = async(e)=>{
-  e.preventDefault()
-  await axios.post('http://localhost:9999/update',dup)
-}
-
-
-
- handleOpen = async(e)=>{
-
-}
-
-
-
-
-
-
+    setUser({ ...user, Age: age, Dateofbirth: dob });
+  };
 
   return (
     <>
-      {/* <input type="text" name='firstname' value={user.firstname} onChange={handleinp} />
-      <input type="text" name='email' value={user.email} onChange={handleinp} />
-      <input type="text" name='passcord' value={user.passcord} onChange={handleinp} />
-      <button type="submit" onClick={postdata}>click</button> */}
+      <input type="text" name='Firstname' value={user.Firstname} onChange={handleinp} />
+      <input type="text" name='Lastname' value={user.Lastname} onChange={handleinp} />
+      <input type="text" name='Email' value={user.Email} onChange={handleinp} />
+      <select type="text" name='Country' value={selectedCountry} onChange={handleCountryChange}>
+        {data.map((item, index) => (
+          <option key={index}>{country(item)}</option>
+        ))}
+      </select>
 
-<table border={1} >
+      <select type="text" name='State' value={selectedState} onChange={handleStateChange}>
+        {selectedCountryStates.map((state, index) => (
+          <option key={index}>{state.name}</option>
+        ))}
+      </select>
 
-        {data.map((item,i) => {
-        return ( <tr key={i}><td style={{display:'none'}} className='user_id'>{item._id} </td> <td>{item.firstname} </td><td>{item.email} </td><td> {item.passcord} </td><td onClick={handleOpen}> edit</td>
-        </tr>)
-        })}
+      <select type="text" name='City' value={user.City} onChange={handleCityChange}>
+        {selectedStateCities.map((city, index) => (
+          <option key={index}>{city}</option>
+        ))}
+      </select>
 
-      </table>
-
-
-
-    <div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-        <input type="text" name='un' value={dup.un} onChange={updt} />
-      <input type="text" name='ue' value={dup.ue} onChange={updt} />
-      <input type="text" name='up' value={dup.up} onChange={updt} />
-      <button type="submit" onClick={updatedata}>Update</button>
-        </Box>
-      </Modal>
-    </div>
-  
-
-
-
-
-
-
-
-
+      <input type="radio" name='Gender' value="Male" onChange={handleinp} />
+      <input type="radio" name='Gender' value="Female" onChange={handleinp} />
+      <input type="date" name='Dateofbirth' value={user.Dateofbirth} onChange={handleinp} id='Dateofbirth' />
+      <input type="text" name='Age' value={user.Age} onChange={handleinp} />
+      <button type="submit" onClick={postdata}>click</button>
 
 
 
