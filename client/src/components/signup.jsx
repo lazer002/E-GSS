@@ -1,68 +1,60 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-
+import React, { useState } from 'react';
+import axios from 'axios';
+import logo from '../assets/logo.svg';
+import { Link } from "react-router-dom";
 
 function Signup() {
-
-  const [data, setData] = useState([]);
-
   const [user, setUser] = useState({
-    Firstname: '', Lastname: '', Email: '', Gender: '', Dateofbirth: '', Age: ''
-  })
-
-
-
+    Email: '', Password: ''
+  });
 
   const handleinp = (e) => {
-    let { name, value } = e.target
-    setUser({ ...user, [name]: value })
-  }
+    const { name, value } = e.target;
+    setUser(prevState => ({ ...prevState, [name]: value }));
+  };
+
   const postdata = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:9999/signup', user);
-      fetchData(); 
+      const res = await axios.post('http://localhost:9999/Signup', user);
+      if (res.status === 200) {
+        alert("Signup successful!"); 
+        document.querySelector('.page').click();
+      } else {
+        alert("Signup failed."); 
+      }
     } catch (error) {
-      console.error('Error posting data:', error);
+      console.log(error);
     }
   };
-  
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:9999/getdata');
-      setData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData()
-  }, [data]);
-  
 
   return (
     <>
-      <input type="text" name='Firstname' value={user.Firstname} onChange={handleinp} />
-      <input type="text" name='Lastname' value={user.Lastname} onChange={handleinp} />
-      <input type="text" name='Email' value={user.Email} onChange={handleinp} />
-     
-      <input type="radio" name='Gender' value="Male" onChange={handleinp} />
-      <input type="radio" name='Gender' value="Female" onChange={handleinp} />
-      <input type="date" name='Dateofbirth' value={user.Dateofbirth} onChange={handleinp} id='Dateofbirth' />
-      <input type="text" name='Age' value={user.Age} onChange={handleinp} />
-      <button type="submit" onClick={postdata}>click</button>
-
-      
-
-{data.map((item,index)=>(
-  <div key={index}>{item.Firstname}</div>
-))}
-
-
+      <div className="container">
+        <div className="wrapper">
+          <div className="glass">
+            <div className='left_side'>
+              <div className=''>
+                <img src={logo} alt="" style={{width:'50%',marginBottom:'4rem'}}/>
+              
+                <h1>Welcome to Our User Sign Up Page</h1>
+                <p>We offer a range of tech services to suit your vision and budget. Answer a few questions and we'll give you a quote for our services.</p>
+              </div>
+            </div>
+            <div className="right_side" >
+            <h1>User Sign Up</h1>
+              <input type="text" name='Email' value={user.Email} onChange={handleinp} placeholder="Enter Your Email" className='form-control'/>
+              <input type="password" name='Password' value={user.Password} onChange={handleinp} placeholder="Enter Your Password"  className='form-control'/>
+              <button type="submit" onClick={postdata}>Sign Up</button>
+              <button type="submit" className='viewpage'>
+                <Link to="/Login" className='page'>Log In</Link>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
-  )
+  );
 }
 
-export default Signup
+export default Signup;
