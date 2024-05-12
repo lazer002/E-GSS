@@ -14,18 +14,7 @@ Email:{
     type:String
 },
 
-Country:{
-    type:String
-},
 
-State:{
-    type:String
-},
-
-
-City:{
-    type:String
-},
 
 Gender:{
     type:String

@@ -7,7 +7,7 @@ function Signup() {
   const [data, setData] = useState([]);
 
   const [user, setUser] = useState({
-    Firstname: '', Lastname: '', Email: '', Country: '', State: '', City: '', Gender: '', Dateofbirth: '', Age: ''
+    Firstname: '', Lastname: '', Email: '', Gender: '', Dateofbirth: '', Age: ''
   })
 
 
@@ -18,29 +18,28 @@ function Signup() {
     setUser({ ...user, [name]: value })
   }
   const postdata = async (e) => {
-    e.preventDefault()
-    console.log(user);
-    await axios.post('http://localhost:9999/signup', user)
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:9999/signup', user);
+      fetchData(); 
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
+  };
+  
 
-  }
-
-
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://localhost:9999/getdata');
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://localhost:9999/getdata');
-        setData(response.data);
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
+    fetchData()
+  }, [data]);
   
 
   return (
@@ -57,6 +56,9 @@ function Signup() {
 
       
 
+{data.map((item,index)=>(
+  <div key={index}>{item.Firstname}</div>
+))}
 
 
     </>
